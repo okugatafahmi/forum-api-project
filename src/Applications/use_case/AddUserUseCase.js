@@ -2,15 +2,15 @@ const RegisterUser = require('../../Domains/users/entities/RegisterUser');
 
 class AddUserUseCase {
   constructor({ userRepository, passwordHash }) {
-    this._userRepository = userRepository;
-    this._passwordHash = passwordHash;
+    this.userRepository = userRepository;
+    this.passwordHash = passwordHash;
   }
 
   async execute(useCasePayload) {
     const registerUser = new RegisterUser(useCasePayload);
-    await this._userRepository.verifyAvailableUsername(registerUser.username);
-    registerUser.password = await this._passwordHash.hash(registerUser.password);
-    return this._userRepository.addUser(registerUser);
+    await this.userRepository.verifyAvailableUsername(registerUser.username);
+    registerUser.password = await this.passwordHash.hash(registerUser.password);
+    return this.userRepository.addUser(registerUser);
   }
 }
 

@@ -4,7 +4,7 @@ const AuthenticationRepository = require('../../Domains/authentications/Authenti
 class AuthenticationRepositoryPostgres extends AuthenticationRepository {
   constructor(pool) {
     super();
-    this._pool = pool;
+    this.pool = pool;
   }
 
   async addToken(token) {
@@ -13,7 +13,7 @@ class AuthenticationRepositoryPostgres extends AuthenticationRepository {
       values: [token],
     };
 
-    await this._pool.query(query);
+    await this.pool.query(query);
   }
 
   async checkAvailabilityToken(token) {
@@ -22,7 +22,7 @@ class AuthenticationRepositoryPostgres extends AuthenticationRepository {
       values: [token],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (result.rows.length === 0) {
       throw new InvariantError('refresh token tidak ditemukan di database');
@@ -35,7 +35,7 @@ class AuthenticationRepositoryPostgres extends AuthenticationRepository {
       values: [token],
     };
 
-    await this._pool.query(query);
+    await this.pool.query(query);
   }
 }
 
