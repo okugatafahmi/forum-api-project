@@ -61,7 +61,6 @@ describe('ThreadUseCase', () => {
       id: 'comment-123',
       content: 'sebuah comment',
       date: new Date(),
-      isDelete: false,
       username: 'dicoding',
     });
     expectedThread.comments = [expectedComment];
@@ -85,7 +84,6 @@ describe('ThreadUseCase', () => {
           id: expectedComment.id,
           content: expectedComment.content,
           date: expectedComment.date,
-          isDelete: expectedComment.isDelete,
           username: expectedComment.username,
         }),
       ]));

@@ -18,7 +18,6 @@ describe('an Comment entities', () => {
       content: 123,
       date: {},
       username: 12,
-      isDelete: false,
       replies: [],
     };
 
@@ -33,7 +32,6 @@ describe('an Comment entities', () => {
       content: 'sebuah comment',
       date: new Date(),
       username: 'dicoding',
-      isDelete: false,
       replies: [],
     };
 
@@ -43,7 +41,6 @@ describe('an Comment entities', () => {
       content,
       date,
       username,
-      isDelete,
       replies,
     } = new Comment(payload);
 
@@ -52,7 +49,6 @@ describe('an Comment entities', () => {
     expect(content).toEqual(payload.content);
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
-    expect(isDelete).toEqual(payload.isDelete);
     expect(replies).toEqual(payload.replies);
   });
 });

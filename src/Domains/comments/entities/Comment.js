@@ -7,7 +7,6 @@ class Comment {
       content,
       date,
       username,
-      isDelete = false,
       replies = [],
     } = payload;
 
@@ -15,7 +14,6 @@ class Comment {
     this.content = content;
     this.date = date;
     this.username = username;
-    this.isDelete = isDelete;
     this.replies = replies;
   }
 
@@ -24,16 +22,14 @@ class Comment {
     content,
     date,
     username,
-    isDelete = false,
     replies = [],
   }) {
-    if (!id || !content || !date || !username
-      || !(isDelete || isDelete === false) || !replies) {
+    if (!id || !content || !date || !username || !replies) {
       throw new Error('COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
     if (typeof id !== 'string' || typeof content !== 'string' || !(date instanceof Date)
-      || typeof username !== 'string' || typeof isDelete !== 'boolean' || !Array.isArray(replies)) {
+      || typeof username !== 'string' || !Array.isArray(replies)) {
       throw new Error('COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

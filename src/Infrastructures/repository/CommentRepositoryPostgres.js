@@ -44,7 +44,7 @@ class CommentRepositoryPostgres extends CommentRepository {
     const result = await this.pool.query(query);
 
     return result.rows.map(({ content, isDelete, ...restCommentAttributes }) => (
-      new Comment({ content: (isDelete ? '**komentar telah dihapus**' : content), isDelete, ...restCommentAttributes })
+      new Comment({ content: (isDelete ? '**komentar telah dihapus**' : content), ...restCommentAttributes })
     ));
   }
 
