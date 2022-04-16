@@ -1,4 +1,5 @@
 const AddedComment = require('../../Domains/comments/entities/AddedComment');
+const Comment = require('../../Domains/comments/entities/Comment');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
@@ -26,18 +27,30 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async deleteCommentById(id) {
     const query = {
-      text: `UPDATE comments 
-      SET content =  '**komentar telah dihapus**', is_delete = TRUE 
-      WHERE id = $1`,
+      text: 'UPDATE comments SET is_delete = TRUE WHERE id = $1',
       values: [id],
     };
 
     await this.pool.query(query);
   }
 
+  async getCommentsByThreadId(threadId) {
+    const query = {
+      text: `SELECT c.id, content, date, is_delete AS "isDelete", u.username FROM comments AS c 
+      LEFT JOIN users AS u ON u.id = c.user_id WHERE c.thread_id = $1 ORDER BY date`,
+      values: [threadId],
+    };
+
+    const result = await this.pool.query(query);
+
+    return result.rows.map(({ content, isDelete, ...restCommentAttributes }) => (
+      new Comment({ content: (isDelete ? '**komentar telah dihapus**' : content), isDelete, ...restCommentAttributes })
+    ));
+  }
+
   async verifyCommentOwner(id, owner) {
     const query = {
-      text: 'SELECT user_id AS "userId" FROM comments WHERE id = $1',
+      text: 'SELECT user_id AS "userId" FROM comments WHERE id = $1 AND is_delete = FALSE',
       values: [id],
     };
     const result = await this.pool.query(query);

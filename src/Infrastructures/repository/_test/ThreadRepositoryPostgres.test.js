@@ -5,8 +5,13 @@ const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 const AddThread = require('../../../Domains/threads/entities/AddThread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
+const Thread = require('../../../Domains/threads/entities/Thread');
 
 describe('ThreadRepositoryPostgres', () => {
+  beforeEach(async () => {
+    await UsersTableTestHelper.addUser({ id: 'user-123', username: 'dicoding' });
+  });
+
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
@@ -20,9 +25,6 @@ describe('ThreadRepositoryPostgres', () => {
     it('should persist add thread and return added thread correctly', async () => {
       // Arrange
       const userId = 'user-123';
-      await UsersTableTestHelper.addUser({
-        id: 'user-123',
-      });
       const addThread = new AddThread({
         title: 'sebuah thread',
         body: 'sebuah body thread',
@@ -40,9 +42,6 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should return added thread correctly', async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({
-        id: 'user-123',
-      });
       const userId = 'user-123';
       const addThread = new AddThread({
         title: 'sebuah thread',
@@ -76,7 +75,6 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should not throw NotFoundError when thread found', async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
       await ThreadsTableTestHelper.addThread({ id: 'thread-123', userId: 'user-123' });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
@@ -86,52 +84,33 @@ describe('ThreadRepositoryPostgres', () => {
     });
   });
 
-  // describe('getPasswordByUsername', () => {
-  //   it('should throw InvariantError when user not found', () => {
-  //     // Arrange
-  //     const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+  describe('getThreadById function', () => {
+    it('should throw NotFoundError when thread not found', async () => {
+      // Arrange
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
-  //     // Action & Assert
-  //     return expect(threadRepositoryPostgres.getPasswordByUsername('dicoding'))
-  //       .rejects
-  //       .toThrowError(InvariantError);
-  //   });
+      // Action & Assert
+      await expect(threadRepositoryPostgres.getThreadById('thread-123'))
+        .rejects.toThrowError(NotFoundError);
+    });
 
-  //   it('should return username password when user is found', async () => {
-  //     // Arrange
-  //     const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-  //     await ThreadsTableTestHelper.addUser({
-  //       username: 'dicoding',
-  //       password: 'secret_password',
-  //     });
+    it('should get thread from database', async () => {
+      // Arrange
+      const expectedThread = new Thread({
+        id: 'thread-123',
+        title: 'sebuah thread',
+        body: 'sebuah body thread',
+        date: new Date(),
+        username: 'dicoding',
+      });
+      await ThreadsTableTestHelper.addThread({ ...expectedThread, userId: 'user-123' });
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
-  //     // Action & Assert
-  //     const password = await threadRepositoryPostgres.getPasswordByUsername('dicoding');
-  //     expect(password).toBe('secret_password');
-  //   });
-  // });
+      // Action
+      const thread = await threadRepositoryPostgres.getThreadById('thread-123');
 
-  // describe('getIdByUsername', () => {
-  //   it('should throw InvariantError when user not found', async () => {
-  //     // Arrange
-  //     const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-
-  //     // Action & Assert
-  //     await expect(threadRepositoryPostgres.getIdByUsername('dicoding'))
-  //       .rejects
-  //       .toThrowError(InvariantError);
-  //   });
-
-  //   it('should return user id correctly', async () => {
-  //     // Arrange
-  //     await ThreadsTableTestHelper.addUser({ id: 'user-321', username: 'dicoding' });
-  //     const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-
-  //     // Action
-  //     const userId = await threadRepositoryPostgres.getIdByUsername('dicoding');
-
-  //     // Assert
-  //     expect(userId).toEqual('user-321');
-  //   });
-  // });
+      // Assert
+      expect(thread).toStrictEqual(expectedThread);
+    });
+  });
 });

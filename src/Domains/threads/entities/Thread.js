@@ -8,7 +8,7 @@ class Thread {
       body,
       date,
       username,
-      comments,
+      comments = [],
     } = payload;
 
     this.id = id;
@@ -25,14 +25,14 @@ class Thread {
     body,
     date,
     username,
-    comments,
+    comments = [],
   }) {
     if (!id || !title || !body || !date || !username || !comments) {
       throw new Error('THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
     if (typeof id !== 'string' || typeof title !== 'string' || typeof body !== 'string'
-    || typeof date !== 'string' || typeof username !== 'string' || !Array.isArray(comments)) {
+    || !(date instanceof Date) || typeof username !== 'string' || !Array.isArray(comments)) {
       throw new Error('THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

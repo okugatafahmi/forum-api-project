@@ -31,7 +31,7 @@ describe('an Comment entities', () => {
     const payload = {
       id: 'comment-123',
       content: 'sebuah comment',
-      date: '2021-08-08T07:19:09.775Z',
+      date: new Date(),
       username: 'dicoding',
       isDelete: false,
       replies: [],

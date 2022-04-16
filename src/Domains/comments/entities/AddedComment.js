@@ -1,4 +1,4 @@
-class AddThread {
+class AddedComment {
   constructor(payload) {
     this.verifyPayload(payload);
 
@@ -20,4 +20,4 @@ class AddThread {
   }
 }
 
-module.exports = AddThread;
+module.exports = AddedComment;

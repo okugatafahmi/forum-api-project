@@ -1,4 +1,4 @@
-class Thread {
+class Comment {
   constructor(payload) {
     this.verifyPayload(payload);
 
@@ -7,8 +7,8 @@ class Thread {
       content,
       date,
       username,
-      isDelete,
-      replies,
+      isDelete = false,
+      replies = [],
     } = payload;
 
     this.id = id;
@@ -24,19 +24,19 @@ class Thread {
     content,
     date,
     username,
-    isDelete,
-    replies,
+    isDelete = false,
+    replies = [],
   }) {
     if (!id || !content || !date || !username
       || !(isDelete || isDelete === false) || !replies) {
       throw new Error('COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof id !== 'string' || typeof content !== 'string' || typeof date !== 'string'
+    if (typeof id !== 'string' || typeof content !== 'string' || !(date instanceof Date)
       || typeof username !== 'string' || typeof isDelete !== 'boolean' || !Array.isArray(replies)) {
       throw new Error('COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }
 }
 
-module.exports = Thread;
+module.exports = Comment;
