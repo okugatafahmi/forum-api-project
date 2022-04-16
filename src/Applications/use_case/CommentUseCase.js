@@ -15,7 +15,7 @@ class CommentUseCase {
   async deleteComment(threadId, commentId, userId) {
     await this.threadRepository.verifyThreadId(threadId);
     await this.commentRepository.verifyCommentOwner(commentId, userId);
-    this.commentRepository.deleteCommentById(commentId);
+    await this.commentRepository.deleteCommentById(commentId);
   }
 }
 
