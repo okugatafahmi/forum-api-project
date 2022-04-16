@@ -1,6 +1,6 @@
 const ThreadUseCase = require('../../../../Applications/use_case/ThreadUseCase');
 
-class ThreadHandler {
+class ThreadsHandler {
   constructor(container) {
     this.container = container;
 
@@ -12,15 +12,13 @@ class ThreadHandler {
     const { id: userId } = request.auth.credentials;
     const addedThread = await threadUseCase.addThread(request.payload, userId);
 
-    const response = h.response({
+    return h.response({
       status: 'success',
       data: {
         addedThread,
       },
-    });
-    response.code(201);
-    return response;
+    }).code(201);
   }
 }
 
-module.exports = ThreadHandler;
+module.exports = ThreadsHandler;
