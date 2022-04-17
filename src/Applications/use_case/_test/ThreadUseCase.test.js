@@ -1,5 +1,7 @@
-const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const Comment = require('../../../Domains/comments/entities/Comment');
+const CommentRepository = require('../../../Domains/comments/CommentRepository');
+const Reply = require('../../../Domains/replies/entities/Reply');
+const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
 const AddThread = require('../../../Domains/threads/entities/AddThread');
 const Thread = require('../../../Domains/threads/entities/Thread');
@@ -50,6 +52,7 @@ describe('ThreadUseCase', () => {
   it('should orchestrating the get thread action correctly', async () => {
     // Arrange
     const threadId = 'thread-123';
+    const commentId = 'comment-123';
     const expectedThread = new Thread({
       id: threadId,
       title: 'sebuah thread',
@@ -58,16 +61,24 @@ describe('ThreadUseCase', () => {
       username: 'dicoding',
     });
     const expectedComment = new Comment({
-      id: 'comment-123',
+      id: commentId,
       content: 'sebuah comment',
       date: new Date(),
       username: 'dicoding',
     });
+    const expectedReply = new Reply({
+      id: 'reply-123',
+      content: 'sebuah balasan',
+      date: new Date(),
+      username: 'dicoding',
+    });
+    expectedComment.replies = [expectedReply];
     expectedThread.comments = [expectedComment];
 
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
+    const mockReplyRepository = new ReplyRepository();
 
     /** mocking needed function */
     mockThreadRepository.getThreadById = jest.fn()
@@ -87,11 +98,21 @@ describe('ThreadUseCase', () => {
           username: expectedComment.username,
         }),
       ]));
+    mockReplyRepository.getRepliesByCommentId = jest.fn()
+      .mockImplementation(() => Promise.resolve([
+        new Reply({
+          id: expectedReply.id,
+          content: expectedReply.content,
+          date: expectedReply.date,
+          username: expectedReply.username,
+        }),
+      ]));
 
     /** creating use case instance */
     const threadUseCase = new ThreadUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
+      replyRepository: mockReplyRepository,
     });
 
     // Action
@@ -101,5 +122,6 @@ describe('ThreadUseCase', () => {
     expect(thread).toStrictEqual(expectedThread);
     expect(mockThreadRepository.getThreadById).toBeCalledWith(threadId);
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(threadId);
+    expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith(commentId);
   });
 });

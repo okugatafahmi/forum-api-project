@@ -82,7 +82,7 @@ describe('CommentRepositoryPostgres', () => {
     });
   });
 
-  describe('getCommensByThreadId function', () => {
+  describe('getCommentsByThreadId function', () => {
     it('should return empty array when no comment', async () => {
       // Arrange
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
@@ -173,6 +173,28 @@ describe('CommentRepositoryPostgres', () => {
         .resolves.not.toThrow(NotFoundError);
       await expect(commentRepositoryPostgres.verifyCommentOwner(commentId, 'user-123'))
         .resolves.not.toThrow(AuthorizationError);
+    });
+  });
+
+  describe('verifyCommentId function', () => {
+    it('should throw NotFoundError when comment not found', async () => {
+      // Arrange
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(commentRepositoryPostgres.verifyCommentId('comment-123'))
+        .rejects
+        .toThrowError(NotFoundError);
+    });
+
+    it('should not throw NotFoundError when comment found', async () => {
+      // Arrange
+      await CommentsTableTestHelper.addComment({ id: 'comment-123', userId: 'user-123' });
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(commentRepositoryPostgres.verifyCommentId('comment-123'))
+        .resolves.not.toThrow(NotFoundError);
     });
   });
 });

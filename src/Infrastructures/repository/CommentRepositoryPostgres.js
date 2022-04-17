@@ -37,7 +37,7 @@ class CommentRepositoryPostgres extends CommentRepository {
   async getCommentsByThreadId(threadId) {
     const query = {
       text: `SELECT c.id, content, date, is_delete AS "isDelete", u.username FROM comments AS c 
-      LEFT JOIN users AS u ON u.id = c.user_id WHERE c.thread_id = $1 ORDER BY date`,
+      LEFT JOIN users AS u ON u.id = c.user_id WHERE thread_id = $1 ORDER BY date`,
       values: [threadId],
     };
 
@@ -60,6 +60,19 @@ class CommentRepositoryPostgres extends CommentRepository {
     const comment = result.rows[0];
     if (comment.userId !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifyCommentId(id) {
+    const query = {
+      text: 'SELECT * FROM comments WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this.pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('comment tidak ditemukan');
     }
   }
 }

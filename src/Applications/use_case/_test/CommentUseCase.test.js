@@ -74,7 +74,7 @@ describe('CommentUseCase', () => {
     });
 
     // Action
-    await commentUseCase.deleteComment(threadId, commentId, userId);
+    await commentUseCase.deleteComment(commentId, threadId, userId);
 
     // Assert
     expect(mockThreadRepository.verifyThreadId).toBeCalledWith(threadId);

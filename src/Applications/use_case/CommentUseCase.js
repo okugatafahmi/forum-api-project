@@ -12,7 +12,7 @@ class CommentUseCase {
     return this.commentRepository.addComment(addComment, threadId, userId);
   }
 
-  async deleteComment(threadId, commentId, userId) {
+  async deleteComment(commentId, threadId, userId) {
     await this.threadRepository.verifyThreadId(threadId);
     await this.commentRepository.verifyCommentOwner(commentId, userId);
     await this.commentRepository.deleteCommentById(commentId);
