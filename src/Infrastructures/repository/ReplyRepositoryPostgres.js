@@ -34,18 +34,16 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     await this.pool.query(query);
   }
 
-  async getRepliesByCommentId(commentId) {
+  async getRepliesByCommentIds(commentIds) {
     const query = {
-      text: `SELECT r.id, content, date, is_delete AS "isDelete", u.username FROM replies AS r 
-      LEFT JOIN users AS u ON u.id = r.user_id WHERE comment_id = $1 ORDER BY date`,
-      values: [commentId],
+      text: `SELECT r.id, content, date, comment_id AS "commentId", is_delete AS "isDelete", u.username FROM replies AS r 
+      INNER JOIN users AS u ON u.id = r.user_id WHERE r.comment_id = ANY($1::text[]) ORDER BY date`,
+      values: [commentIds],
     };
 
     const result = await this.pool.query(query);
 
-    return result.rows.map(({ content, isDelete, ...restReplyAttributes }) => (
-      new Reply({ content: (isDelete ? '**balasan telah dihapus**' : content), ...restReplyAttributes })
-    ));
+    return result.rows;
   }
 
   async verifyReplyOwner(id, owner) {

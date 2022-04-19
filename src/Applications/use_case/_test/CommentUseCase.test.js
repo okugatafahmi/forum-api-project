@@ -23,14 +23,12 @@ describe('CommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockThreadRepository.verifyThreadId = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.addComment = jest.fn()
-      .mockImplementation(() => Promise.resolve(new AddedComment({
-        id: 'comment-123',
-        content: 'sebuah comment',
-        owner: 'user-123',
-      })));
+    mockThreadRepository.verifyThreadId = jest.fn(() => Promise.resolve());
+    mockCommentRepository.addComment = jest.fn(() => Promise.resolve(new AddedComment({
+      id: 'comment-123',
+      content: 'sebuah comment',
+      owner: 'user-123',
+    })));
 
     /** creating use case instance */
     const commentUseCase = new CommentUseCase({
@@ -60,12 +58,9 @@ describe('CommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockThreadRepository.verifyThreadId = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.verifyCommentOwner = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.deleteCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve());
+    mockThreadRepository.verifyThreadId = jest.fn(() => Promise.resolve());
+    mockCommentRepository.verifyCommentOwner = jest.fn(() => Promise.resolve());
+    mockCommentRepository.deleteCommentById = jest.fn(() => Promise.resolve());
 
     /** creating use case instance */
     const commentUseCase = new CommentUseCase({

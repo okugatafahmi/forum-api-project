@@ -26,12 +26,11 @@ describe('ThreadUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockThreadRepository.addThread = jest.fn()
-      .mockImplementation(() => Promise.resolve(new AddedThread({
-        id: 'thread-123',
-        title: 'sebuah thread',
-        owner: 'user-123',
-      })));
+    mockThreadRepository.addThread = jest.fn(() => Promise.resolve(new AddedThread({
+      id: 'thread-123',
+      title: 'sebuah thread',
+      owner: 'user-123',
+    })));
 
     /** creating use case instance */
     const threadUseCase = new ThreadUseCase({
@@ -81,32 +80,30 @@ describe('ThreadUseCase', () => {
     const mockReplyRepository = new ReplyRepository();
 
     /** mocking needed function */
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(new Thread({
-        id: expectedThread.id,
-        title: expectedThread.title,
-        body: expectedThread.body,
-        date: expectedThread.date,
-        username: expectedThread.username,
-      })));
-    mockCommentRepository.getCommentsByThreadId = jest.fn()
-      .mockImplementation(() => Promise.resolve([
-        new Comment({
-          id: expectedComment.id,
-          content: expectedComment.content,
-          date: expectedComment.date,
-          username: expectedComment.username,
-        }),
-      ]));
-    mockReplyRepository.getRepliesByCommentId = jest.fn()
-      .mockImplementation(() => Promise.resolve([
-        new Reply({
-          id: expectedReply.id,
-          content: expectedReply.content,
-          date: expectedReply.date,
-          username: expectedReply.username,
-        }),
-      ]));
+    mockThreadRepository.getThreadById = jest.fn(() => Promise.resolve(new Thread({
+      id: expectedThread.id,
+      title: expectedThread.title,
+      body: expectedThread.body,
+      date: expectedThread.date,
+      username: expectedThread.username,
+    })));
+    mockCommentRepository.getCommentsByThreadId = jest.fn(() => Promise.resolve([
+      new Comment({
+        id: expectedComment.id,
+        content: expectedComment.content,
+        date: expectedComment.date,
+        username: expectedComment.username,
+      }),
+    ]));
+    mockReplyRepository.getRepliesByCommentIds = jest.fn(() => Promise.resolve([
+      {
+        id: expectedReply.id,
+        content: expectedReply.content,
+        date: expectedReply.date,
+        username: expectedReply.username,
+        commentId: expectedComment.id,
+      },
+    ]));
 
     /** creating use case instance */
     const threadUseCase = new ThreadUseCase({
@@ -122,6 +119,6 @@ describe('ThreadUseCase', () => {
     expect(thread).toStrictEqual(expectedThread);
     expect(mockThreadRepository.getThreadById).toBeCalledWith(threadId);
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(threadId);
-    expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith(commentId);
+    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith([commentId]);
   });
 });

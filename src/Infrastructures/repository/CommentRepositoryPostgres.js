@@ -37,15 +37,13 @@ class CommentRepositoryPostgres extends CommentRepository {
   async getCommentsByThreadId(threadId) {
     const query = {
       text: `SELECT c.id, content, date, is_delete AS "isDelete", u.username FROM comments AS c 
-      LEFT JOIN users AS u ON u.id = c.user_id WHERE thread_id = $1 ORDER BY date`,
+      INNER JOIN users AS u ON u.id = c.user_id WHERE thread_id = $1 ORDER BY date`,
       values: [threadId],
     };
 
     const result = await this.pool.query(query);
 
-    return result.rows.map(({ content, isDelete, ...restCommentAttributes }) => (
-      new Comment({ content: (isDelete ? '**komentar telah dihapus**' : content), ...restCommentAttributes })
-    ));
+    return result.rows.map((commentPayload) => new Comment(commentPayload));
   }
 
   async verifyCommentOwner(id, owner) {

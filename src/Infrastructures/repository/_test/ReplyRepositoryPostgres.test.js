@@ -85,13 +85,13 @@ describe('ReplyRepositoryPostgres', () => {
     });
   });
 
-  describe('getRepliesByCommentId function', () => {
+  describe('getRepliesByCommentIds function', () => {
     it('should return empty array when no reply', async () => {
       // Arrange
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
       // Action
-      const replies = await replyRepositoryPostgres.getRepliesByCommentId('comment-123');
+      const replies = await replyRepositoryPostgres.getRepliesByCommentIds(['comment-123']);
 
       // Assert
       expect(replies).toEqual([]);
@@ -99,47 +99,62 @@ describe('ReplyRepositoryPostgres', () => {
 
     it('should get replies from database', async () => {
       // Arrange
-      const expectedReply = new Reply({
+      const expectedReply = {
         id: 'reply-123',
-        content: 'sebuah reply',
+        content: 'sebuah balasan',
         date: new Date(),
         username: 'dicoding',
-      });
+      };
       await RepliesTableTestHelper.addReply({ ...expectedReply, userId, commentId });
+      // second comment & second reply
+      const commentId2 = 'comment-124';
+      await CommentsTableTestHelper.addComment({ id: commentId2, threadId: 'thread-123', userId: 'user-123' });
+      const expectedReply2 = {
+        id: 'reply-124',
+        content: 'sebuah balasan 2',
+        date: new Date(),
+        username: 'dicoding',
+      };
+      await RepliesTableTestHelper.addReply({ ...expectedReply2, userId, commentId: commentId2 });
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
       // Action
-      const replies = await replyRepositoryPostgres.getRepliesByCommentId('comment-123');
+      const replies = await replyRepositoryPostgres.getRepliesByCommentIds(['comment-123', 'comment-124']);
 
       // Assert
-      expect(replies).toHaveLength(1);
-      expect(replies[0]).toStrictEqual(expectedReply);
+      expect(replies).toHaveLength(2);
+      expect(replies[0]).toStrictEqual({ ...expectedReply, commentId, isDelete: false });
+      expect(replies[1]).toStrictEqual({
+        ...expectedReply2,
+        commentId: commentId2,
+        isDelete: false,
+      });
     });
 
     it('should get replies from database correctly when reply has been deleted', async () => {
       // Arrange
-      const expectedReply = new Reply({
+      const expectedReply = {
         id: 'reply-123',
-        content: '**balasan telah dihapus**',
+        content: 'sebuah balasan',
         date: new Date(),
         username: 'dicoding',
-      });
+      };
       await RepliesTableTestHelper.addReply({
         id: expectedReply.id,
-        content: 'sebuah reply',
+        content: expectedReply.content,
         date: expectedReply.date,
         userId: 'user-123',
-        threadId: 'thread-123',
+        commentId,
         isDelete: true,
       });
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
       // Action
-      const replies = await replyRepositoryPostgres.getRepliesByCommentId('comment-123');
+      const replies = await replyRepositoryPostgres.getRepliesByCommentIds(['comment-123']);
 
       // Assert
       expect(replies).toHaveLength(1);
-      expect(replies[0]).toStrictEqual(expectedReply);
+      expect(replies[0]).toStrictEqual({ ...expectedReply, commentId, isDelete: true });
     });
   });
 

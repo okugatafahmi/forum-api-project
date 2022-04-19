@@ -1,4 +1,5 @@
 const Comment = require('../../Domains/comments/entities/Comment');
+const Reply = require('../../Domains/replies/entities/Reply');
 const AddThread = require('../../Domains/threads/entities/AddThread');
 
 class ThreadUseCase {
@@ -15,15 +16,19 @@ class ThreadUseCase {
 
   async getThread(id) {
     const thread = await this.threadRepository.getThreadById(id);
-    thread.comments = await Promise.all((await this.commentRepository.getCommentsByThreadId(id))
-      .map(
-        async ({ replies, id: commentId, ...restCommentAttributes }) => (new Comment({
-          replies: await this.replyRepository.getRepliesByCommentId(commentId),
-          id: commentId,
-          ...restCommentAttributes,
-        })),
-      ));
-    // thread.comments = await this.commentRepository.getCommentsByThreadId(id);
+    const comments = await this.commentRepository.getCommentsByThreadId(id);
+
+    const commentIds = comments.map((comment) => comment.id);
+    const replies = await this.replyRepository.getRepliesByCommentIds(commentIds);
+
+    thread.comments = comments.map(
+      ({ replies: commentReplies, id: commentId, ...restAttributes }) => new Comment({
+        replies: replies.filter((reply) => reply.commentId === commentId)
+          .map((replyPayload) => new Reply(replyPayload)),
+        id: commentId,
+        ...restAttributes,
+      }),
+    );
     return thread;
   }
 }

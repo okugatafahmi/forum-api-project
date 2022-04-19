@@ -25,6 +25,32 @@ describe('an Comment entities', () => {
     expect(() => new Comment(payload)).toThrowError('COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
+  it('should create Comment object correctly with default value', () => {
+    // Arrange
+    const payload = {
+      id: 'comment-123',
+      content: 'sebuah comment',
+      date: new Date(),
+      username: 'dicoding',
+    };
+
+    // Action
+    const {
+      id,
+      content,
+      date,
+      username,
+      replies,
+    } = new Comment(payload);
+
+    // Assert
+    expect(id).toEqual(payload.id);
+    expect(content).toEqual(payload.content);
+    expect(date).toEqual(payload.date);
+    expect(username).toEqual(payload.username);
+    expect(replies).toEqual([]);
+  });
+
   it('should create Comment object correctly', () => {
     // Arrange
     const payload = {
@@ -47,6 +73,34 @@ describe('an Comment entities', () => {
     // Assert
     expect(id).toEqual(payload.id);
     expect(content).toEqual(payload.content);
+    expect(date).toEqual(payload.date);
+    expect(username).toEqual(payload.username);
+    expect(replies).toEqual(payload.replies);
+  });
+
+  it('should create Comment object correctly when isDelete true', () => {
+    // Arrange
+    const payload = {
+      id: 'comment-123',
+      content: 'sebuah comment',
+      date: new Date(),
+      username: 'dicoding',
+      replies: [],
+      isDelete: true,
+    };
+
+    // Action
+    const {
+      id,
+      content,
+      date,
+      username,
+      replies,
+    } = new Comment(payload);
+
+    // Assert
+    expect(id).toEqual(payload.id);
+    expect(content).toEqual('**komentar telah dihapus**');
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
     expect(replies).toEqual(payload.replies);

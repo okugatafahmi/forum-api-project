@@ -27,8 +27,8 @@ describe('an Reply entities', () => {
   it('should create Reply object correctly', () => {
     // Arrange
     const payload = {
-      id: 'comment-123',
-      content: 'sebuah comment',
+      id: 'reply-123',
+      content: 'sebuah balasan',
       date: new Date(),
       username: 'dicoding',
     };
@@ -44,6 +44,31 @@ describe('an Reply entities', () => {
     // Assert
     expect(id).toEqual(payload.id);
     expect(content).toEqual(payload.content);
+    expect(date).toEqual(payload.date);
+    expect(username).toEqual(payload.username);
+  });
+
+  it('should create Reply object correctly when isDelete true', () => {
+    // Arrange
+    const payload = {
+      id: 'reply-123',
+      content: 'sebuah balasan',
+      date: new Date(),
+      username: 'dicoding',
+      isDelete: true,
+    };
+
+    // Action
+    const {
+      id,
+      content,
+      date,
+      username,
+    } = new Reply(payload);
+
+    // Assert
+    expect(id).toEqual(payload.id);
+    expect(content).toEqual('**balasan telah dihapus**');
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
   });
