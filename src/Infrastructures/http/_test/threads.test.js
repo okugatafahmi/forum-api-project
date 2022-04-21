@@ -1,25 +1,29 @@
 const pool = require('../../database/postgres/pool');
-const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
-const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const container = require('../../container');
 const createServer = require('../createServer');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+const RegisterHelper = require('../../../../tests/RegisterHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
+const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 
 describe('/threads endpoint', () => {
-  beforeEach(async () => {
-    await UsersTableTestHelper.addUser({ id: 'user-123' });
-  });
+  let userId;
+  let accessToken;
 
-  afterEach(async () => {
-    await ThreadsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
+  beforeAll(async () => {
+    ({ userId, accessToken } = await RegisterHelper.getUserIdAndAccessToken());
   });
 
   afterAll(async () => {
+    await RegisterHelper.cleanTable();
     await pool.end();
   });
 
   describe('when POST /threads', () => {
+    afterEach(async () => {
+      await ThreadsTableTestHelper.cleanTable();
+    });
+
     it('should response 201 and persisted thread', async () => {
       // Arrange
       const requestPayload = {
@@ -33,11 +37,8 @@ describe('/threads endpoint', () => {
         method: 'POST',
         url: '/threads',
         payload: requestPayload,
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -60,11 +61,8 @@ describe('/threads endpoint', () => {
         method: 'POST',
         url: '/threads',
         payload: requestPayload,
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -88,11 +86,8 @@ describe('/threads endpoint', () => {
         method: 'POST',
         url: '/threads',
         payload: requestPayload,
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -105,11 +100,21 @@ describe('/threads endpoint', () => {
   });
 
   describe('when GET /threads', () => {
+    beforeEach(async () => {
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123', userId });
+      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: 'thread-123', userId });
+      await RepliesTableTestHelper.addReply({ id: 'reply-123', commentId: 'comment-123', userId });
+    });
+
+    afterEach(async () => {
+      await RepliesTableTestHelper.cleanTable();
+      await CommentsTableTestHelper.cleanTable();
+      await ThreadsTableTestHelper.cleanTable();
+    });
+
     it('should response 200 and thread detail', async () => {
       // Arrange
       const server = await createServer(container);
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123', userId: 'user-123' });
-      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: 'thread-123' });
 
       // Action
       const response = await server.inject({
@@ -122,6 +127,8 @@ describe('/threads endpoint', () => {
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual('success');
       expect(responseJson.data.thread).toBeDefined();
+      expect(responseJson.data.thread.comments).toBeDefined();
+      expect(responseJson.data.thread.comments[0].replies).toBeDefined();
     });
 
     it('should response 404 when thread not found', async () => {

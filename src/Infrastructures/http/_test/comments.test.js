@@ -1,27 +1,30 @@
 const pool = require('../../database/postgres/pool');
-const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
-const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
-const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const container = require('../../container');
 const createServer = require('../createServer');
+const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+const RegisterHelper = require('../../../../tests/RegisterHelper');
+const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 
 describe('/comments endpoint', () => {
-  beforeEach(async () => {
-    await UsersTableTestHelper.addUser({ id: 'user-123' });
-    await ThreadsTableTestHelper.addThread({ id: 'thread-123', userId: 'user-123' });
-  });
+  let userId;
+  let accessToken;
 
-  afterEach(async () => {
-    await CommentsTableTestHelper.cleanTable();
-    await ThreadsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
+  beforeAll(async () => {
+    ({ userId, accessToken } = await RegisterHelper.getUserIdAndAccessToken());
+    await ThreadsTableTestHelper.addThread({ id: 'thread-123', userId });
   });
 
   afterAll(async () => {
+    await ThreadsTableTestHelper.cleanTable();
+    await RegisterHelper.cleanTable();
     await pool.end();
   });
 
   describe('when POST /comments', () => {
+    afterEach(async () => {
+      await CommentsTableTestHelper.cleanTable();
+    });
+
     it('should response 201 and persisted comment', async () => {
       // Arrange
       const requestPayload = {
@@ -34,11 +37,8 @@ describe('/comments endpoint', () => {
         method: 'POST',
         url: '/threads/thread-123/comments',
         payload: requestPayload,
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -61,11 +61,8 @@ describe('/comments endpoint', () => {
         method: 'POST',
         url: '/threads/thread-999/comments',
         payload: requestPayload,
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -86,11 +83,8 @@ describe('/comments endpoint', () => {
         method: 'POST',
         url: '/threads/thread-123/comments',
         payload: requestPayload,
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -113,11 +107,8 @@ describe('/comments endpoint', () => {
         method: 'POST',
         url: '/threads/thread-123/comments',
         payload: requestPayload,
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -131,7 +122,11 @@ describe('/comments endpoint', () => {
 
   describe('when DELETE /comments', () => {
     beforeEach(async () => {
-      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: 'thread-123', userId: 'user-123' });
+      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: 'thread-123', userId });
+    });
+
+    afterEach(async () => {
+      await CommentsTableTestHelper.cleanTable();
     });
 
     it('should response 200', async () => {
@@ -142,11 +137,8 @@ describe('/comments endpoint', () => {
       const response = await server.inject({
         method: 'DELETE',
         url: '/threads/thread-123/comments/comment-123',
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -184,11 +176,8 @@ describe('/comments endpoint', () => {
       const response = await server.inject({
         method: 'DELETE',
         url: '/threads/thread-999/comments/comment-123',
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -207,11 +196,8 @@ describe('/comments endpoint', () => {
       const response = await server.inject({
         method: 'DELETE',
         url: '/threads/thread-123/comments/comment-999',
-        auth: {
-          strategy: 'forum_api_jwt',
-          credentials: {
-            id: 'user-123',
-          },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
