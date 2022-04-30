@@ -1,6 +1,6 @@
 const ReplyUseCase = require('../../../../Applications/use_case/ReplyUseCase');
 
-class ReplysHandler {
+class RepliesHandler {
   constructor(container) {
     this.container = container;
 
@@ -34,4 +34,4 @@ class ReplysHandler {
   }
 }
 
-module.exports = ReplysHandler;
+module.exports = RepliesHandler;
