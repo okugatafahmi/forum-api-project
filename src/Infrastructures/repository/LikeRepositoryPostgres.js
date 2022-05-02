@@ -27,7 +27,7 @@ class LikeRepositoryPostgres extends LikeRepository {
 
     const result = await this.pool.query(query);
     if (!result.rowCount) {
-      throw new NotFoundError('Like tidak ditemukan');
+      throw new NotFoundError('like tidak ditemukan');
     }
   }
 }
