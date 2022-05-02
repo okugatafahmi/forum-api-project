@@ -96,12 +96,14 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should get comments from database', async () => {
       // Arrange
-      const expectedComment = new Comment({
+      const expectedComment = {
         id: 'comment-123',
         content: 'sebuah comment',
         date: new Date(),
         username: 'dicoding',
-      });
+        isDelete: false,
+        likeCount: 0,
+      };
       await CommentsTableTestHelper.addComment({ ...expectedComment, userId: 'user-123', threadId: 'thread-123' });
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
@@ -115,12 +117,14 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should get comments from database correctly when comment has been deleted', async () => {
       // Arrange
-      const expectedComment = new Comment({
+      const expectedComment = {
         id: 'comment-123',
-        content: '**komentar telah dihapus**',
+        content: 'sebuah comment',
         date: new Date(),
         username: 'dicoding',
-      });
+        isDelete: true,
+        likeCount: 0,
+      };
       await CommentsTableTestHelper.addComment({
         id: expectedComment.id,
         content: 'sebuah comment',
