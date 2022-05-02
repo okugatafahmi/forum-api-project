@@ -38,6 +38,8 @@ describe('LikeRepositoryPostgres', () => {
       // Assert
       const likes = await LikesTableTestHelper.findLikesById('like-123');
       expect(likes).toHaveLength(1);
+      expect(likes[0].userId).toEqual(userId);
+      expect(likes[0].commentId).toEqual(commentId);
     });
   });
 

@@ -18,6 +18,7 @@ describe('an Comment entities', () => {
       content: 123,
       date: {},
       username: 12,
+      likeCount: true,
       replies: [],
     };
 
@@ -32,6 +33,7 @@ describe('an Comment entities', () => {
       content: 'sebuah comment',
       date: new Date(),
       username: 'dicoding',
+      likeCount: 2,
     };
 
     // Action
@@ -40,6 +42,7 @@ describe('an Comment entities', () => {
       content,
       date,
       username,
+      likeCount,
       replies,
     } = new Comment(payload);
 
@@ -48,6 +51,7 @@ describe('an Comment entities', () => {
     expect(content).toEqual(payload.content);
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
+    expect(likeCount).toEqual(payload.likeCount);
     expect(replies).toEqual([]);
   });
 
@@ -58,6 +62,8 @@ describe('an Comment entities', () => {
       content: 'sebuah comment',
       date: new Date(),
       username: 'dicoding',
+      isDelete: false,
+      likeCount: 0,
       replies: [],
     };
 
@@ -67,6 +73,7 @@ describe('an Comment entities', () => {
       content,
       date,
       username,
+      likeCount,
       replies,
     } = new Comment(payload);
 
@@ -75,6 +82,7 @@ describe('an Comment entities', () => {
     expect(content).toEqual(payload.content);
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
+    expect(likeCount).toEqual(payload.likeCount);
     expect(replies).toEqual(payload.replies);
   });
 
@@ -85,6 +93,7 @@ describe('an Comment entities', () => {
       content: 'sebuah comment',
       date: new Date(),
       username: 'dicoding',
+      likeCount: 2,
       replies: [],
       isDelete: true,
     };
@@ -95,6 +104,7 @@ describe('an Comment entities', () => {
       content,
       date,
       username,
+      likeCount,
       replies,
     } = new Comment(payload);
 
@@ -103,6 +113,7 @@ describe('an Comment entities', () => {
     expect(content).toEqual('**komentar telah dihapus**');
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
+    expect(likeCount).toEqual(payload.likeCount);
     expect(replies).toEqual(payload.replies);
   });
 });

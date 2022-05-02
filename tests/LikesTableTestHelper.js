@@ -17,7 +17,7 @@ const LikesTableTestHelper = {
 
   async findLikesById(id) {
     const query = {
-      text: 'SELECT * FROM likes WHERE id = $1',
+      text: 'SELECT id, user_id AS "userId", comment_id AS "commentId" FROM likes WHERE id = $1',
       values: [id],
     };
 

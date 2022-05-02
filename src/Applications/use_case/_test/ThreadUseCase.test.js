@@ -64,6 +64,7 @@ describe('ThreadUseCase', () => {
       content: 'sebuah comment',
       date: new Date(),
       username: 'dicoding',
+      likeCount: 0,
     });
     const expectedReply = new Reply({
       id: 'reply-123',
@@ -88,12 +89,14 @@ describe('ThreadUseCase', () => {
       username: expectedThread.username,
     })));
     mockCommentRepository.getCommentsByThreadId = jest.fn(() => Promise.resolve([
-      new Comment({
+      {
         id: expectedComment.id,
         content: expectedComment.content,
         date: expectedComment.date,
         username: expectedComment.username,
-      }),
+        isDelete: false,
+        likeCount: expectedComment.likeCount,
+      },
     ]));
     mockReplyRepository.getRepliesByCommentIds = jest.fn(() => Promise.resolve([
       {
