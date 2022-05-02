@@ -2,6 +2,7 @@ const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelp
 const LikesTableTestHelper = require('../../../../tests/LikesTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const pool = require('../../database/postgres/pool');
 const LikeRepositoryPostgres = require('../LikeRepositoryPostgres');
 
@@ -56,6 +57,15 @@ describe('LikeRepositoryPostgres', () => {
       // Assert
       const likes = await LikesTableTestHelper.findLikesById(likeId);
       expect(likes).toHaveLength(0);
+    });
+
+    it('should throw error when like not found', async () => {
+      // Arrange
+      const likeRepositoryPostgres = new LikeRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(likeRepositoryPostgres.deleteLike(commentId, userId))
+        .rejects.toThrowError(NotFoundError);
     });
   });
 });
