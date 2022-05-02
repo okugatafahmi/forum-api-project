@@ -64,7 +64,6 @@ describe('ThreadUseCase', () => {
       content: 'sebuah comment',
       date: new Date(),
       username: 'dicoding',
-      isDelete: false,
       likeCount: 0,
     });
     const expectedReply = new Reply({

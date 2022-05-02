@@ -7,9 +7,9 @@ class Comment {
       content,
       date,
       username,
-      isDelete,
       likeCount,
       replies = [],
+      isDelete = false,
     } = payload;
 
     this.id = id;
@@ -27,7 +27,7 @@ class Comment {
     username,
     likeCount,
     replies = [],
-    isDelete,
+    isDelete = false,
   }) {
     if (!id || !content || !date || !username || !replies || !(isDelete || isDelete === false)
       || !(likeCount || likeCount === 0)) {
